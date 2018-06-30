@@ -27,10 +27,12 @@ public class FileController {
     private Map<Integer, byte[]> files = new Hashtable<>();
     
     @PostMapping
-    public ResponseEntity uploadFile(@RequestParam("file") @Valid @NotNull MultipartFile file) throws IOException {
-        
-        files.put(files.size(), file.getBytes());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Integer> uploadFile(@RequestParam("file") @Valid @NotNull MultipartFile file) throws
+                                                                                                        IOException {
+    
+        int fileId = files.size();
+        files.put(fileId, file.getBytes());
+        return ResponseEntity.ok(fileId);
     }
     
     @GetMapping("/{fileId}")
