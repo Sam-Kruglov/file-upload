@@ -8,6 +8,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.cloud.netflix.feign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @FeignClient(name = "file-storage", configuration = FileFeignClient.MultipartSupportConfig.class)
 public interface FileFeignClient {
     
-    @PostMapping("/api/v1/file")
+    @PostMapping(value = "/api/v1/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     ResponseEntity<Integer> create(@RequestPart("file") MultipartFile file);
     
     @GetMapping("/{fileId}")

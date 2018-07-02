@@ -32,10 +32,9 @@ public class ClientApplication {
         
         String filename = "bla.txt";
         byte[] file     = Files.readAllBytes(Paths.get(getClass().getResource("/" + filename).toURI()));
-        //todo JsonMappingException: No serializer found for class java.io.ByteArrayInputStream
+        //todo Load balancer does not have available server for client: file-storage
         Integer fileId       = service.uploadFile(file, filename);
         String  fileContents = new String(service.downloadFile(fileId));
-        
         System.out.println(fileContents);
     }
 }
