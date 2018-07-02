@@ -8,16 +8,22 @@ import org.apache.commons.lang.ArrayUtils;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * todo there may a better way that works out of the box using
+ * {@link feign.form.spring.converter.ByteArrayMultipartFile}
+ */
 @AllArgsConstructor
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ByteArrayMultipartFile implements MultipartFile {
     
+    @NotNull
     @Getter
     byte[] bytes;
     
@@ -46,7 +52,7 @@ public class ByteArrayMultipartFile implements MultipartFile {
     @Override
     public boolean isEmpty() {
         
-        return ArrayUtils.isEmpty(bytes);
+        return bytes.length == 0;
     }
     
     @Override
@@ -64,6 +70,8 @@ public class ByteArrayMultipartFile implements MultipartFile {
     @Override
     public void transferTo(File dest) throws IOException, IllegalStateException {
         
-        new FileOutputStream(dest).write(bytes);
+        try ( FileOutputStream out = new FileOutputStream(dest) ) {
+            out.write(bytes);
+        }
     }
 }
