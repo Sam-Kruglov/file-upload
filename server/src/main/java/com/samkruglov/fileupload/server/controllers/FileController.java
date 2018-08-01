@@ -1,5 +1,6 @@
 package com.samkruglov.fileupload.server.controllers;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -24,18 +25,19 @@ import java.util.Map;
 @RequestMapping("api/v1/files")
 public class FileController {
     
-    private Map<Integer, byte[]> files = new Hashtable<>();
-    
+    @VisibleForTesting
+    public Map<Integer, byte[]> files = new Hashtable<>();
+
     @PostMapping
     public ResponseEntity<Integer> uploadFile(@RequestParam("file") @Valid @NotNull MultipartFile file) throws
                                                                                                         IOException {
-    
+
         int fileId = files.size();
         files.put(fileId, file.getBytes());
         return ResponseEntity.ok(fileId);
     }
     
-    @GetMapping("/{fileId}")
+    @GetMapping("{fileId}")
     public ResponseEntity<InputStreamResource> downloadFile(@PathVariable("fileId") @Valid @NotNull Integer fileId)
             throws UnsupportedEncodingException {
         

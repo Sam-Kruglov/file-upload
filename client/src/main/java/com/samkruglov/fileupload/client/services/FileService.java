@@ -1,14 +1,15 @@
 package com.samkruglov.fileupload.client.services;
 
-import com.samkruglov.fileupload.client.FileFeignClient;
+import com.samkruglov.fileupload.client.services.daos.FileFeignDao;
+import com.samkruglov.fileupload.client.services.daos.FileTemplateDao;
 import com.samkruglov.fileupload.client.utils.ByteArrayMultipartFile;
+import com.samkruglov.fileupload.client.utils.MultipartInputStreamResource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import org.apache.commons.io.IOUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 @AllArgsConstructor
@@ -16,17 +17,34 @@ import java.io.InputStream;
 @Service
 public class FileService {
     
-    FileFeignClient fileClient;
+    FileFeignDao feign;
     
-    public Integer uploadFile(byte[] fileContents, String filename) {
+    FileTemplateDao template;
+    
+    public Integer uploadFile(@NonNull byte[] fileContents, @NonNull String filename) {
         
-        return fileClient.create(new ByteArrayMultipartFile(fileContents, "file", filename)).getBody();
+        return feign.create(new ByteArrayMultipartFile(fileContents, "file", filename)).getBody();
     }
     
-    public byte[] downloadFile(Integer fileId) throws IOException {
+    /**
+     * Uploads.
+     */
+    public Integer streamFileOut(@NonNull InputStream fileContents, @NonNull String filename,
+                                 @NonNull long contentLength, String desc) {
         
-        try ( InputStream in = fileClient.downloadFile(fileId).getBody().getInputStream() ) {
-            return IOUtils.toByteArray(in);
-        }
+        return template.postFile(new MultipartInputStreamResource(fileContents, filename, contentLength, desc));
+    }
+    
+    /**
+     * Downloads.
+     */
+    public InputStream streamFileIn(@NonNull Integer fileId) {
+        
+        return template.getFile(fileId);
+    }
+    
+    public byte[] downloadFile(@NonNull Integer fileId) {
+        
+        return feign.downloadFile(fileId).getBody();
     }
 }
